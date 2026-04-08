@@ -1,54 +1,76 @@
-# Claude Agents UI — React + Python
+# Claude Agent Management
 
-Migrated from Nuxt 3 + Node.js to **Vite + React + TypeScript** (frontend) and **FastAPI** (backend).
+A full-stack web UI for managing Claude Code configuration — agents, commands, skills, workflows, MCP servers, and settings — with a built-in terminal and chat interface.
 
-## Structure
+**Stack:** Vite + React + TypeScript (frontend) · FastAPI + Python (backend)
+
+## Features
+
+- **Agents** — Create and edit Claude Code agent definitions
+- **Commands** — Manage slash commands (`/commands`)
+- **Skills** — Define and edit reusable skills
+- **Workflows** — Build multi-step agent workflows
+- **MCP Servers** — Configure Model Context Protocol servers
+- **Settings** — Edit Claude Code `settings.json` directly
+- **Graph View** — Visualize relationships between entities
+- **Terminal** — Embedded PTY terminal (xterm.js)
+- **Chat** — Real-time Claude chat via WebSocket
+
+## Project Structure
 
 ```
-claude-code-agents-ui-react/
-├── backend/    # Python FastAPI
-└── frontend/   # Vite + React + TypeScript
+claude_agent_management/
+├── backend/        # Python FastAPI (port 8000)
+├── frontend/       # Vite + React + TypeScript (port 5173)
+└── start.sh        # One-command startup script
 ```
 
-## Setup
+## Quick Start
+
+```bash
+./start.sh
+```
+
+This will:
+1. Create a Python virtual environment and install backend dependencies (first run)
+2. Install frontend npm dependencies (first run)
+3. Start both servers concurrently
+
+- Frontend: http://localhost:5173
+- Backend API: http://localhost:8000
+- API docs: http://localhost:8000/docs
+
+Press `Ctrl+C` to stop both servers.
+
+## Manual Setup
 
 ### Backend
 
+Requires Python 3.11+
+
 ```bash
 cd backend
-
-# Create virtual environment
 python3 -m venv .venv
 source .venv/bin/activate
-
-# Install dependencies
 pip install -r requirements.txt
-
-# Start dev server (API at http://localhost:8000)
-uvicorn main:app --reload --host 0.0.0.0 --port 8000
+uvicorn backend.main:app --reload --host 0.0.0.0 --port 8000 --app-dir ..
 ```
-
-API docs available at: http://localhost:8000/docs
 
 ### Frontend
 
+Requires Node.js
+
 ```bash
 cd frontend
-
-# Install dependencies
-npm install   # or: bun install
-
-# Start dev server (UI at http://localhost:5173)
+npm install
 npm run dev
 ```
-
-The frontend proxies `/api` and `/ws` requests to the backend at `localhost:8000`.
 
 ## Environment Variables
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `CLAUDE_DIR` | `~/.claude` | Override path to Claude config directory |
+| `CLAUDE_DIR` | `~/.claude` | Path to Claude config directory |
 
 ## Pages
 
@@ -65,26 +87,41 @@ The frontend proxies `/api` and `/ws` requests to the backend at `localhost:8000
 | `/workflows/:slug` | Workflow editor |
 | `/cli` | Terminal + Chat |
 | `/graph` | Relationship graph |
+| `/mcp` | MCP servers |
 | `/settings` | Settings editor |
 
 ## API Endpoints
 
 | Method | Path | Description |
 |--------|------|-------------|
-| GET | `/api/agents` | List agents |
-| GET | `/api/agents/{slug}` | Get agent |
-| POST | `/api/agents` | Create agent |
-| PUT | `/api/agents/{slug}` | Update agent |
-| DELETE | `/api/agents/{slug}` | Delete agent |
-| GET | `/api/commands` | List commands |
-| GET/POST/PUT/DELETE | `/api/commands/{slug}` | Command CRUD |
-| GET | `/api/skills` | List skills |
-| GET/POST/PUT/DELETE | `/api/skills/{slug}` | Skill CRUD |
-| GET | `/api/workflows` | List workflows |
-| GET/POST/PUT/DELETE | `/api/workflows/{slug}` | Workflow CRUD |
-| GET/PUT | `/api/settings` | Settings |
-| GET | `/api/relationships` | Entity graph |
-| GET/POST/DELETE | `/api/mcp` | MCP servers |
+| GET | `/health` | Health check |
+| GET / POST | `/api/agents` | List / create agents |
+| GET / PUT / DELETE | `/api/agents/{slug}` | Get / update / delete agent |
+| GET / POST | `/api/commands` | List / create commands |
+| GET / PUT / DELETE | `/api/commands/{slug}` | Command CRUD |
+| GET / POST | `/api/skills` | List / create skills |
+| GET / PUT / DELETE | `/api/skills/{slug}` | Skill CRUD |
+| GET / POST | `/api/workflows` | List / create workflows |
+| GET / PUT / DELETE | `/api/workflows/{slug}` | Workflow CRUD |
+| GET / PUT | `/api/settings` | Read / write settings |
+| GET | `/api/relationships` | Entity relationship graph |
+| GET / POST / DELETE | `/api/mcp` | MCP server management |
 | WS | `/ws/chat` | Claude chat WebSocket |
 | WS | `/ws/cli` | PTY terminal WebSocket |
-# claude_agent_management
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Frontend framework | React 18 + TypeScript |
+| Build tool | Vite 5 |
+| Styling | Tailwind CSS 3 |
+| Routing | React Router v6 |
+| Data fetching | TanStack Query v5 |
+| Terminal | xterm.js |
+| Graph | React Flow |
+| Icons | Lucide React |
+| Backend | FastAPI + Uvicorn |
+| Config parsing | python-frontmatter + PyYAML |
+| PTY | ptyprocess |
+| Git integration | GitPython |
